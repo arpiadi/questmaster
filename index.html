@@ -12,15 +12,13 @@
             font-family: 'Poppins', sans-serif;
             background-color: #f0f2f5;
             transition: background-color 0.3s ease;
+            overscroll-behavior-y: none;
         }
 
         .quest-card { transition: all 0.2s ease; }
         .progress-bar { transition: width 0.5s ease-out; }
         .checkbox-custom { width: 24px; height: 24px; cursor: pointer; }
-        .delete-btn { display: none; }
-        .edit-mode .delete-btn { display: flex; }
-        .edit-mode .checkbox-container { display: none; }
-        .locked-quest { opacity: 0.7; pointer-events: none; }
+        /* Removed locked-quest style as it is no longer needed */
 
         @keyframes confetti {
             0% { transform: translateY(0) rotate(0deg); opacity: 1; }
@@ -30,33 +28,30 @@
             position: fixed; top: -10px; width: 10px; height: 10px;
             z-index: 200; animation: confetti 3s linear forwards;
         }
+        
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-32">
 
     <!-- Header & Profil -->
-    <div id="app-header" class="p-6 rounded-b-3xl shadow-lg sticky top-0 z-50 transition-all duration-500">
+    <div id="app-header" class="p-6 rounded-b-3xl shadow-lg sticky top-0 z-50 transition-all duration-500 bg-indigo-600 text-white">
         <div class="flex justify-between items-start mb-4">
             <div class="flex flex-col gap-2">
-                <button onclick="toggleThemeMenu()" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg text-xs font-bold backdrop-blur-sm flex items-center gap-2">
+                <button onclick="toggleThemeMenu()" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg text-xs font-bold backdrop-blur-sm flex items-center gap-2 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
                     Ganti Tema
                 </button>
                 <div class="flex items-center gap-2">
-                    <h1 id="theme-title" class="text-2xl font-bold leading-tight truncate max-w-[180px]">Nama Tema</h1>
+                    <h1 id="theme-title" class="text-2xl font-bold leading-tight truncate max-w-[180px]">Quest Master</h1>
                 </div>
             </div>
             <div class="text-right flex flex-col items-end gap-2">
                 <span id="level-badge" class="bg-yellow-400 text-gray-900 px-3 py-1 rounded-full font-bold text-sm shadow-sm">LVL 1</span>
                 <span id="xp-title" class="px-2 py-1 rounded-lg font-semibold text-base shadow-md bg-white text-indigo-600 border border-indigo-300">Pemula</span>
-                <!-- Tambahkan tombol untuk mengaktifkan mode edit -->
-                <button onclick="toggleEditMode()" id="edit-master-btn" class="bg-white/20 hover:bg-white/30 p-2 rounded-lg transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-                    </svg>
-                </button>
+                <button onclick="openEditTitlesModal()" class="bg-black/10 hover:bg-black/20 text-white px-3 py-1 rounded-lg text-[10px] font-bold transition-colors">Edit Gelar</button>
             </div>
         </div>
 
@@ -76,20 +71,20 @@
     </div>
 
     <!-- Tab View Switcher -->
-    <div class="flex border-b bg-white sticky top-[210px] z-40">
-        <button onclick="switchView('quests')" id="tab-quests" class="flex-1 py-3 font-bold transition-all border-b-2">Quests</button>
-        <button onclick="switchView('rewards')" id="tab-rewards" class="flex-1 py-3 font-bold transition-all border-b-2">Rewards</button>
+    <div class="flex border-b bg-white sticky top-[180px] z-40 shadow-sm">
+        <button onclick="switchView('quests')" id="tab-quests" class="flex-1 py-3 font-bold transition-all border-b-2 text-indigo-600 border-indigo-600">Quests</button>
+        <button onclick="switchView('rewards')" id="tab-rewards" class="flex-1 py-3 font-bold transition-all border-b-2 text-gray-400 border-transparent hover:bg-gray-50">Rewards</button>
     </div>
 
     <main class="p-4 max-w-md mx-auto">
         <!-- Tampilan Quests -->
         <div id="view-quests" class="space-y-6">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 flex justify-between items-center" id="summary-card">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 flex justify-between items-center transition-all" id="summary-card">
                 <div>
-                    <h2 class="font-bold text-gray-700">Skor Hari Ini: <span id="daily-xp" class="text-xl">0</span> XP</h2>
-                    <p id="lock-status" class="text-[10px] text-gray-400 mt-1">Status: Terbuka</p>
+                    <h2 class="font-bold text-gray-700">Skor Hari Ini: <span id="daily-xp" class="text-xl text-indigo-600">0</span> XP</h2>
+                    <p class="text-[10px] text-gray-400 mt-1">Auto-Save Aktif</p>
                 </div>
-                <div id="edit-indicator" class="hidden text-red-500 font-bold text-xs animate-pulse">MODE EDIT</div>
+                <div id="edit-indicator" class="hidden text-red-500 font-bold text-xs animate-pulse border border-red-200 bg-red-50 px-2 py-1 rounded">MODE EDIT</div>
             </div>
             <div id="quest-categories-container" class="space-y-8 pb-10"></div>
         </div>
@@ -98,121 +93,137 @@
         <div id="view-rewards" class="hidden space-y-6 pb-10">
             <div class="flex justify-between items-center">
                 <h3 class="font-bold text-gray-800 text-lg">Target Hadiah</h3>
-                <button onclick="openAddRewardModal()" id="btn-add-reward" class="text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md">+ Tambah</button>
+                <button onclick="openAddRewardModal()" id="btn-add-reward" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md transition-colors">+ Tambah</button>
             </div>
             <div id="rewards-container" class="space-y-3"></div>
+            <div id="empty-rewards-msg" class="hidden text-center text-gray-400 text-sm py-8">
+                Belum ada target hadiah. Tambahkan untuk memotivasi dirimu!
+            </div>
         </div>
     </main>
 
     <!-- Drawer Pemilih Tema -->
-    <div id="theme-menu" class="fixed inset-0 bg-black/50 z-[100] hidden items-end justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto">
+    <div id="theme-menu" class="fixed inset-0 bg-black/50 z-[100] hidden items-end justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto shadow-2xl">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800">Pilih Tema Quest</h3>
-                <!-- Tombol Tambah Tema -->
-                <button onclick="openAddThemeModal()" class="text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md bg-indigo-600">+ Tambah Tema</button>
+                <button onclick="openAddThemeModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md transition-colors">+ Tambah</button>
             </div>
             <div id="theme-list-container" class="grid grid-cols-1 gap-3"></div>
-            <button onclick="toggleThemeMenu()" class="w-full mt-6 py-3 text-gray-500 font-bold">Tutup</button>
-        </div>
-    </div>
-
-    <!-- Modal Milestone -->
-    <div id="milestone-modal" class="fixed inset-0 bg-black/80 z-[200] hidden flex-col items-center justify-center p-6 text-center">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl">
-            <h2 id="milestone-icon" class="text-4xl mb-4">👑</h2>
-            <h1 class="text-3xl font-black mb-2" id="milestone-text">Luar Biasa!</h1>
-            <p id="milestone-desc-text" class="text-gray-600 mb-6 font-medium"></p>
-            <button onclick="closeMilestone()" id="milestone-close-btn" class="text-white px-10 py-3 rounded-full font-bold shadow-xl">LANJUTKAN</button>
+            <button onclick="toggleThemeMenu()" class="w-full mt-6 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors">Tutup</button>
         </div>
     </div>
 
     <!-- Bar Aksi Bawah -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-around items-center z-50">
-        <button onclick="resetDaily()" class="flex flex-col items-center text-gray-400">
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2 pb-6 md:pb-2 flex justify-between items-center z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] px-6">
+        <button onclick="resetDaily()" class="flex flex-col items-center text-gray-400 hover:text-gray-600 p-2 rounded-lg transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-            <span class="text-[10px]">Ulang</span>
+            <span class="text-[10px] font-medium">Reset</span>
         </button>
-        <button onclick="importData()" class="flex flex-col items-center text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-            <span class="text-[10px]">Impor</span>
+        
+        <button onclick="toggleEditMode()" id="btn-edit-mode" class="flex flex-col items-center text-gray-400 hover:text-gray-600 p-2 rounded-lg transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+            <span class="text-[10px] font-medium">Kelola</span>
         </button>
-        <button onclick="saveProgress()" id="btn-save" class="text-white px-8 py-2 rounded-full font-bold shadow-lg active:opacity-80 transition-all">Simpan Progres</button>
-        <button onclick="exportData()" class="flex flex-col items-center text-gray-400">
+
+        <button onclick="exportData()" class="flex flex-col items-center text-gray-400 hover:text-gray-600 p-2 rounded-lg transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-            <span class="text-[10px]">Ekspor</span>
+            <span class="text-[10px] font-medium">Backup</span>
+        </button>
+        
+        <button onclick="importData()" class="flex flex-col items-center text-gray-400 hover:text-gray-600 p-2 rounded-lg transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" transform="rotate(180 12 12)"/></svg>
+            <span class="text-[10px] font-medium">Restore</span>
         </button>
     </div>
 
-    <!-- Modal Umum -->
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-6 z-[110]">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center">
-            <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
-            <p id="modal-desc" class="text-gray-600 mb-6 text-sm"></p>
-            <button onclick="closeModal()" id="modal-btn" class="w-full text-white py-2 rounded-xl font-bold">Oke!</button>
+    <!-- Modals -->
+    <!-- Add Theme Modal -->
+    <div id="add-theme-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-[110] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Tambah Tema</h3>
+            <input type="text" id="new-theme-title" placeholder="Nama Tema (misal: Skripsi, Gym)" class="w-full p-3 bg-gray-100 rounded-xl mb-4 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <select id="new-theme-accent" class="w-full p-3 bg-gray-100 rounded-xl mb-4 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="indigo">Indigo (Biru Ungu)</option>
+                <option value="emerald">Emerald (Hijau)</option>
+                <option value="rose">Rose (Merah Muda)</option>
+                <option value="amber">Amber (Oranye)</option>
+                <option value="violet">Violet (Ungu)</option>
+            </select>
+            <div class="flex gap-2">
+                <button onclick="closeAddThemeModal()" class="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors">Batal</button>
+                <button onclick="addNewTheme()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors">Tambah</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Input -->
-    <div id="input-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-6 z-[110]">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 id="input-modal-title" class="text-xl font-bold mb-4 text-gray-800"></h3>
-            <div class="space-y-4" id="input-modal-fields"></div>
+    <!-- Edit Titles Modal -->
+    <div id="edit-titles-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-[110] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Edit Gelar XP</h3>
+            <div id="titles-list" class="space-y-3 max-h-[40vh] overflow-y-auto pr-2"></div>
+            <button onclick="addNewTitle()" class="w-full mt-4 py-2 border-2 border-dashed border-gray-300 hover:border-indigo-400 text-gray-400 hover:text-indigo-500 rounded-lg font-bold transition-all">+ Tambah Gelar</button>
             <div class="flex gap-2 pt-4">
-                <button onclick="closeInputModal()" class="flex-1 py-3 text-gray-500 font-bold">Batal</button>
-                <button id="input-modal-confirm" class="flex-1 py-3 text-white rounded-xl font-bold shadow-lg">Konfirmasi</button>
+                <button onclick="closeEditTitlesModal()" class="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors">Batal</button>
+                <button onclick="saveTitles()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors">Simpan</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Tambah Tema -->
-    <div id="add-theme-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-[110]">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">Tambah Tema Baru</h3>
-            <div class="space-y-4">
-                <input type="text" id="new-theme-title" placeholder="Nama Tema" class="w-full p-3 bg-gray-100 rounded-xl">
-                <select id="new-theme-accent" class="w-full p-3 bg-gray-100 rounded-xl">
-                    <option value="indigo">Indigo</option>
-                    <option value="emerald">Emerald</option>
-                    <option value="rose">Rose</option>
-                    <option value="amber">Amber</option>
-                    <option value="violet">Violet</option>
-                </select>
-            </div>
-            <div class="flex gap-2 pt-4">
-                <button onclick="closeAddThemeModal()" class="flex-1 py-3 text-gray-500 font-bold">Batal</button>
-                <button onclick="addNewTheme()" class="flex-1 py-3 text-white rounded-xl font-bold shadow-lg bg-indigo-600">Tambah</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit Gelar -->
-    <div id="edit-titles-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-[110]">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">Edit Gelar</h3>
-            <div id="titles-list" class="space-y-4">
-                <!-- Daftar gelar akan dirender di sini -->
-            </div>
-            <button onclick="addNewTitle()" class="w-full mt-4 py-2 bg-indigo-600 text-white rounded-lg font-bold">+ Tambah Gelar</button>
-            <div class="flex gap-2 pt-4">
-                <button onclick="closeEditTitlesModal()" class="flex-1 py-3 text-gray-500 font-bold">Batal</button>
-                <button onclick="saveTitles()" class="flex-1 py-3 text-white rounded-xl font-bold shadow-lg bg-indigo-600">Simpan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit Quest -->
-    <div id="edit-quest-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-[110]">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+    <!-- Edit Quest Modal -->
+    <div id="edit-quest-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-[110] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <h3 id="edit-quest-modal-title" class="text-xl font-bold mb-4 text-gray-800">Edit Quest</h3>
             <div class="space-y-4">
-                <input type="text" id="quest-name" placeholder="Nama Quest" class="w-full p-3 bg-gray-100 rounded-xl">
-                <input type="number" id="quest-xp" placeholder="XP (contoh: 20)" class="w-full p-3 bg-gray-100 rounded-xl">
+                <input type="text" id="quest-name" placeholder="Nama Quest" class="w-full p-3 bg-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input type="number" id="quest-xp" placeholder="XP (contoh: 20)" class="w-full p-3 bg-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
             </div>
             <div class="flex gap-2 pt-4">
-                <button onclick="closeEditQuestModal()" class="flex-1 py-3 text-gray-500 font-bold">Batal</button>
-                <button onclick="saveQuest()" class="flex-1 py-3 text-white rounded-xl font-bold shadow-lg bg-indigo-600">Simpan</button>
+                <button onclick="closeEditQuestModal()" class="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors">Batal</button>
+                <button onclick="saveQuest()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors">Simpan</button>
             </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM CONFIRM MODAL -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-[200] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl transform transition-all scale-100">
+            <h3 class="text-lg font-bold mb-2 text-gray-800">Konfirmasi</h3>
+            <p id="confirm-msg" class="text-gray-600 mb-6 text-sm">Apakah Anda yakin?</p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirmModal()" class="flex-1 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors">Batal</button>
+                <button id="confirm-yes-btn" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors">Ya</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM PROMPT MODAL -->
+    <div id="prompt-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-[200] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h3 id="prompt-title" class="text-lg font-bold mb-4 text-gray-800">Input</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 ml-1 block mb-1">Nama Hadiah</label>
+                    <input type="text" id="prompt-input-1" class="w-full p-3 bg-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 ml-1 block mb-1">Biaya XP</label>
+                    <input type="number" id="prompt-input-2" class="w-full p-3 bg-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closePromptModal()" class="flex-1 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors">Batal</button>
+                <button id="prompt-submit-btn" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM MESSAGE MODAL -->
+    <div id="msg-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-[200] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
+            <div id="msg-icon" class="mb-2 text-4xl">✨</div>
+            <p id="msg-text" class="text-gray-800 font-semibold mb-4"></p>
+            <button onclick="closeMsgModal()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold w-full">Oke</button>
         </div>
     </div>
 
@@ -229,66 +240,130 @@
             currentTheme: 'health',
             themes: {
                 health: { 
-                    title: 'Health Quest', accent: 'indigo', totalXp: 0, dailyChecked: {}, streak: 0, lastSaveDate: '', 
+                    title: 'Health Quest', accent: 'indigo', totalXp: 0, dailyChecked: {}, streak: 0, lastActiveDate: '', 
                     customQuests: {
                         wajib: { title: "📜 Quest Wajib", items: [{ id: 'hw1', label: 'Minum Air 2L', xp: 20 }, { id: 'hw2', label: 'Olahraga 15m', xp: 50 }] },
                         bonus: { title: "🔵 Quest Bonus", items: [{ id: 'hb1', label: 'Meditasi', xp: 10 }] },
                         negatif: { title: "🔴 Quest Negatif", items: [{ id: 'hn1', label: 'Makan Junk Food', xp: -30 }] }
                     }, 
                     rewards: []
-                },
-                work: {
-                    title: 'Work Mode', accent: 'emerald', totalXp: 0, dailyChecked: {}, streak: 0, lastSaveDate: '',
-                    customQuests: {
-                        wajib: { title: "💼 Pekerjaan Utama", items: [{ id: 'ww1', label: 'Selesaikan Task', xp: 30 }] },
-                        bonus: { title: "🚀 Bonus Skill", items: [{ id: 'wb1', label: 'Belajar 30m', xp: 20 }] },
-                        negatif: { title: "📱 Distraksi", items: [{ id: 'wn1', label: 'Sosmed > 1 jam', xp: -20 }] }
-                    },
-                    rewards: []
                 }
             }
         };
 
-        let isEditMode = false; // Tambahkan variabel untuk melacak mode edit
-        let activeView = 'quests';
-
-        // Daftar gelar yang dapat diedit
         let titles = [
             { name: "Pemula", xp: 0 },
-            { name: "Disiplin Muscle", xp: 500 },
-            { name: "Master Quest", xp: 2000 },
-            { name: "Elite Achiever", xp: 5000 },
-            { name: "Legendary Hero", xp: 10000 }
+            { name: "Disiplin", xp: 500 },
+            { name: "Master", xp: 2000 },
+            { name: "Legend", xp: 5000 }
         ];
 
+        let isEditMode = false;
+        let activeView = 'quests';
         let currentQuestCategory = null;
         let currentQuestIndex = null;
+        let confirmAction = null;
+        let promptAction = null;
+
+        // --- Custom Modal Functions (Replacing Alert/Confirm/Prompt) ---
+
+        function showConfirm(message, onYes) {
+            document.getElementById('confirm-msg').innerText = message;
+            confirmAction = onYes;
+            document.getElementById('confirm-modal').classList.replace('hidden', 'flex');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.replace('flex', 'hidden');
+            confirmAction = null;
+        }
+
+        document.getElementById('confirm-yes-btn').addEventListener('click', () => {
+            if (confirmAction) confirmAction();
+            closeConfirmModal();
+        });
+
+        function showPrompt(onSubmit) {
+            document.getElementById('prompt-input-1').value = '';
+            document.getElementById('prompt-input-2').value = '';
+            promptAction = onSubmit;
+            document.getElementById('prompt-modal').classList.replace('hidden', 'flex');
+        }
+
+        function closePromptModal() {
+            document.getElementById('prompt-modal').classList.replace('flex', 'hidden');
+            promptAction = null;
+        }
+
+        document.getElementById('prompt-submit-btn').addEventListener('click', () => {
+            const val1 = document.getElementById('prompt-input-1').value;
+            const val2 = document.getElementById('prompt-input-2').value;
+            if (val1 && val2 && promptAction) {
+                promptAction(val1, val2);
+                closePromptModal();
+            }
+        });
+        
+        function showMessage(text, icon="✨") {
+            document.getElementById('msg-text').innerText = text;
+            document.getElementById('msg-icon').innerText = icon;
+            document.getElementById('msg-modal').classList.replace('hidden', 'flex');
+        }
+        
+        function closeMsgModal() {
+            document.getElementById('msg-modal').classList.replace('flex', 'hidden');
+        }
+
+        // --- Core Logic ---
 
         function init() {
-            const saved = localStorage.getItem('quest_master_v7_full');
-            if (saved) {
-                globalState = JSON.parse(saved);
+            try {
+                const saved = localStorage.getItem('quest_master_v7_full');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // Merge with default to ensure structure exists
+                    if (parsed.state) globalState = parsed.state;
+                    if (parsed.titles) titles = parsed.titles;
+                    
+                    // Migration: Ensure lastActiveDate exists if migrating from old 'lastSaveDate'
+                    Object.values(globalState.themes).forEach(t => {
+                        if (t.lastSaveDate && !t.lastActiveDate) {
+                            t.lastActiveDate = t.lastSaveDate;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error("Error loading save:", e);
+                showMessage("Gagal memuat data tersimpan. Memulai data baru.", "⚠️");
             }
+            
+            // Validate currentTheme exists
+            if (!globalState.themes[globalState.currentTheme]) {
+                globalState.currentTheme = Object.keys(globalState.themes)[0];
+            }
+
             checkDateReset();
             applyThemeStyles();
             renderAll();
             updateUI();
         }
 
+        function saveToStorage() {
+            localStorage.setItem('quest_master_v7_full', JSON.stringify({ state: globalState, titles: titles }));
+        }
+
+        // Clears daily checks if the day has changed since last activity
         function checkDateReset() {
             const today = new Date().toLocaleDateString();
             Object.keys(globalState.themes).forEach(key => {
                 const theme = globalState.themes[key];
-                if (theme.lastSaveDate !== today) {
-                    theme.dailyChecked = {}; 
+                // If there is a last active date recorded, and it's not today, clear the checks
+                if (theme.lastActiveDate && theme.lastActiveDate !== today) {
+                    theme.dailyChecked = {};
+                    // Note: We do NOT update lastActiveDate here. It updates when user takes action.
                 }
             });
             saveToStorage();
-        }
-
-        function isTodaySaved() {
-            const theme = globalState.themes[globalState.currentTheme];
-            return theme.lastSaveDate === new Date().toLocaleDateString();
         }
 
         function applyThemeStyles() {
@@ -296,17 +371,21 @@
             const preset = colorPresets[theme.accent] || colorPresets.indigo;
             
             document.getElementById('app-header').className = `${preset.bg} text-white p-6 rounded-b-3xl shadow-lg sticky top-0 z-50 transition-all duration-500`;
-            document.getElementById('btn-save').className = `${preset.bg} text-white px-8 py-2 rounded-full font-bold shadow-lg active:opacity-80 transition-all`;
-            document.getElementById('btn-add-reward').className = `${preset.bg} text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md`;
+            document.getElementById('btn-add-reward').className = `${preset.bg} hover:opacity-90 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md transition-colors`;
             
             const tabQ = document.getElementById('tab-quests');
             const tabR = document.getElementById('tab-rewards');
-            tabQ.className = `flex-1 py-3 font-bold ${activeView==='quests' ? preset.text : 'text-gray-400'} border-b-2 ${activeView==='quests' ? 'border-current' : 'border-transparent'}`;
-            tabR.className = `flex-1 py-3 font-bold ${activeView==='rewards' ? preset.text : 'text-gray-400'} border-b-2 ${activeView==='rewards' ? 'border-current' : 'border-transparent'}`;
             
-            document.getElementById('modal-btn').className = `w-full ${preset.bg} text-white py-2 rounded-xl font-bold`;
-            document.getElementById('input-modal-confirm').className = `flex-1 py-3 ${preset.bg} text-white rounded-xl font-bold shadow-lg`;
+            if (activeView === 'quests') {
+                tabQ.className = `flex-1 py-3 font-bold transition-all border-b-2 ${preset.text} border-current`;
+                tabR.className = `flex-1 py-3 font-bold transition-all border-b-2 text-gray-400 border-transparent hover:bg-gray-50`;
+            } else {
+                tabQ.className = `flex-1 py-3 font-bold transition-all border-b-2 text-gray-400 border-transparent hover:bg-gray-50`;
+                tabR.className = `flex-1 py-3 font-bold transition-all border-b-2 ${preset.text} border-current`;
+            }
+            
             document.getElementById('summary-card').style.borderLeftColor = preset.hex;
+            document.getElementById('daily-xp').className = `text-xl ${preset.text}`;
         }
 
         function renderAll() {
@@ -319,7 +398,6 @@
             const theme = globalState.themes[globalState.currentTheme];
             const preset = colorPresets[theme.accent];
             const container = document.getElementById('quest-categories-container');
-            const saved = isTodaySaved();
             container.innerHTML = '';
 
             Object.keys(theme.customQuests).forEach(catKey => {
@@ -329,185 +407,257 @@
                 let itemsHtml = '';
                 category.items.forEach((item, index) => {
                     const isChecked = theme.dailyChecked[item.id] || false;
-                    const isLocked = saved && isChecked;
 
                     itemsHtml += `
-                        <div class="quest-card bg-white p-3 rounded-xl shadow-sm flex items-center justify-between border border-transparent ${isChecked ? preset.border + ' ' + preset.light : ''} ${isLocked ? 'locked-quest' : ''}">
+                        <div onclick="toggleQuest('${catKey}', ${index})" class="quest-card bg-white p-3 rounded-xl shadow-sm flex items-center justify-between border-2 ${isChecked ? preset.border + ' ' + preset.light : 'border-transparent'} cursor-pointer hover:border-gray-200 select-none">
                             <div class="flex-1 mr-4">
-                                <h4 class="font-semibold text-sm ${isChecked ? 'line-through text-gray-400' : 'text-gray-700'}">${item.label}</h4>
+                                <h4 class="font-semibold text-sm ${isChecked ? 'text-gray-400' : 'text-gray-700'}">${item.label}</h4>
+                                <span class="text-[10px] font-bold ${item.xp > 0 ? preset.text : 'text-red-500'}">${item.xp > 0 ? '+' : ''}${item.xp} XP</span>
                             </div>
-                            <div class="flex items-center gap-3 ${isEditMode ? '' : 'hidden'}">
-                                <span class="text-xs font-bold ${item.xp > 0 ? 'text-green-500' : 'text-red-500'}">${item.xp > 0 ? '+' : ''}${item.xp}</span>
-                                <button onclick="openEditQuestModal('${catKey}', ${index})" class="text-blue-500 text-sm font-bold">Edit</button>
-                                <button onclick="deleteQuest('${catKey}', ${index})" class="text-red-500 text-sm font-bold">Hapus</button>
+                            <div class="flex items-center gap-2">
+                                ${isEditMode ? `
+                                    <button onclick="event.stopPropagation(); openEditQuestModal('${catKey}', ${index})" class="p-2 bg-blue-50 text-blue-500 rounded-lg hover:bg-blue-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
+                                    </button>
+                                    <button onclick="event.stopPropagation(); deleteQuest('${catKey}', ${index})" class="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                    </button>
+                                ` : `
+                                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${isChecked ? preset.bg + ' border-transparent' : 'border-gray-200'}">
+                                        ${isChecked ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                                    </div>
+                                `}
                             </div>
                         </div>`;
                 });
 
                 section.innerHTML = `
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="font-bold text-gray-800">${category.title}</h3>
-                        <button onclick="openEditQuestModal('${catKey}')" class="${isEditMode ? preset.text : 'hidden'} text-xs font-bold">+ Quest</button>
+                    <div class="flex justify-between items-center mb-3 mt-6">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">${category.title}</h3>
+                        ${isEditMode ? `<button onclick="openEditQuestModal('${catKey}')" class="text-xs font-bold ${preset.text} bg-white px-2 py-1 rounded-md shadow-sm">+ Quest</button>` : ''}
                     </div>
-                    <div class="space-y-2">${itemsHtml || '<p class="text-center text-xs text-gray-400 py-2">Belum ada quest</p>'}</div>`;
+                    <div class="space-y-2">${itemsHtml || '<p class="text-center text-xs text-gray-400 py-4 border-2 border-dashed border-gray-200 rounded-xl">Belum ada quest di kategori ini</p>'}</div>`;
                 container.appendChild(section);
             });
         }
 
-        // Fungsi untuk membuka modal edit quest
-        function openEditQuestModal(categoryKey, questIndex = null) {
-            currentQuestCategory = categoryKey;
-            currentQuestIndex = questIndex;
+        // New Logic: Toggle immediately updates Total XP and Auto-Saves
+        function toggleQuest(catKey, index) {
+            if (isEditMode) return;
+            
+            const theme = globalState.themes[globalState.currentTheme];
+            const item = theme.customQuests[catKey].items[index];
+            const today = new Date().toLocaleDateString();
 
-            const quest = questIndex !== null ? globalState.themes[globalState.currentTheme].customQuests[categoryKey].items[questIndex] : { label: '', xp: 0 };
-
-            document.getElementById('quest-name').value = quest.label;
-            document.getElementById('quest-xp').value = quest.xp;
-            document.getElementById('edit-quest-modal-title').innerText = questIndex !== null ? 'Edit Quest' : 'Tambah Quest';
-
-            document.getElementById('edit-quest-modal').classList.replace('hidden', 'flex');
-        }
-
-        // Fungsi untuk menutup modal edit quest
-        function closeEditQuestModal() {
-            document.getElementById('edit-quest-modal').classList.replace('flex', 'hidden');
-            currentQuestCategory = null;
-            currentQuestIndex = null;
-        }
-
-        // Fungsi untuk menyimpan quest (tambah atau edit)
-        function saveQuest() {
-            const name = document.getElementById('quest-name').value.trim();
-            const xp = parseInt(document.getElementById('quest-xp').value, 10);
-
-            if (!name || isNaN(xp)) {
-                alert('Nama dan XP harus diisi.');
-                return;
+            // Check for new day before processing action
+            if (theme.lastActiveDate && theme.lastActiveDate !== today) {
+                // It's a new day! Reset checks first.
+                theme.dailyChecked = {};
+                // Increment streak since this is the first action of the new day
+                theme.streak++;
+                createConfetti(); 
+            } else if (!theme.lastActiveDate) {
+                // First time ever using or migrated
+                theme.streak = 1;
             }
 
-            const quests = globalState.themes[globalState.currentTheme].customQuests[currentQuestCategory].items;
-
-            if (currentQuestIndex !== null) {
-                // Edit quest
-                quests[currentQuestIndex].label = name;
-                quests[currentQuestIndex].xp = xp;
+            if (theme.dailyChecked[item.id]) {
+                // Uncheck: Remove XP
+                delete theme.dailyChecked[item.id];
+                theme.totalXp -= item.xp;
             } else {
-                // Tambah quest baru
-                quests.push({ id: `q_${Date.now()}`, label: name, xp });
+                // Check: Add XP
+                theme.dailyChecked[item.id] = true;
+                theme.totalXp += item.xp;
             }
-
+            
+            if(theme.totalXp < 0) theme.totalXp = 0;
+            
+            theme.lastActiveDate = today;
             saveToStorage();
             renderQuests();
-            closeEditQuestModal();
+            updateUI();
         }
 
-        // Fungsi untuk menghapus quest
-        function deleteQuest(categoryKey, questIndex) {
-            if (confirm('Apakah Anda yakin ingin menghapus quest ini?')) {
-                const quests = globalState.themes[globalState.currentTheme].customQuests[categoryKey].items;
-                quests.splice(questIndex, 1);
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            document.getElementById('edit-indicator').classList.toggle('hidden', !isEditMode);
+            const btnEdit = document.getElementById('btn-edit-mode');
+            if (isEditMode) {
+                btnEdit.classList.add('text-indigo-600', 'bg-indigo-50');
+                btnEdit.classList.remove('text-gray-400');
+            } else {
+                btnEdit.classList.remove('text-indigo-600', 'bg-indigo-50');
+                btnEdit.classList.add('text-gray-400');
+            }
+            renderQuests();
+        }
 
+        function switchView(view) {
+            activeView = view;
+            document.getElementById('view-quests').classList.toggle('hidden', view !== 'quests');
+            document.getElementById('view-rewards').classList.toggle('hidden', view !== 'rewards');
+            applyThemeStyles();
+        }
+
+        function toggleThemeMenu() {
+            const menu = document.getElementById('theme-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
+            } else {
+                menu.classList.add('hidden');
+                menu.classList.remove('flex');
+            }
+        }
+
+        function switchTheme(key) {
+            globalState.currentTheme = key;
+            saveToStorage();
+            toggleThemeMenu();
+            applyThemeStyles();
+            renderAll();
+            updateUI();
+        }
+
+        function resetDaily() {
+            const theme = globalState.themes[globalState.currentTheme];
+            showConfirm("Reset semua centang quest hari ini? (XP yang didapat hari ini akan dibatalkan)", () => {
+                // We need to subtract the XP gained today before clearing
+                Object.keys(theme.dailyChecked).forEach(id => {
+                    Object.values(theme.customQuests).forEach(cat => {
+                         const item = cat.items.find(i => i.id === id);
+                         if (item) theme.totalXp -= item.xp;
+                    });
+                });
+                if(theme.totalXp < 0) theme.totalXp = 0;
+
+                theme.dailyChecked = {};
                 saveToStorage();
                 renderQuests();
-            }
+                updateUI();
+            });
         }
 
-        function saveProgress() {
-            const theme = globalState.themes[globalState.currentTheme];
-            const today = new Date().toLocaleDateString();
-            
-            if (theme.lastSaveDate === today) {
-                return notify("Sudah Tersimpan", "Progres hari ini telah terkunci.");
-            }
-            
-            theme.lastSaveDate = today;
-            theme.streak++;
-            saveToStorage();
-            renderQuests(); 
-            updateUI();
-            notify("Tersimpan!", "Data telah dikunci di memori browser.");
+        // Title System
+        function getTitleByXP(xp) {
+            let current = titles[0].name;
+            titles.forEach(t => { if (xp >= t.xp) current = t.name; });
+            return current;
         }
 
-        // Fungsi untuk membuka modal edit gelar
         function openEditTitlesModal() {
             const container = document.getElementById('titles-list');
             container.innerHTML = '';
-            titles.forEach((title, index) => {
+            titles.forEach((t, i) => {
                 container.innerHTML += `
-                    <div class="flex items-center gap-2">
-                        <input type="text" value="${title.name}" class="flex-1 p-2 bg-gray-100 rounded-lg border" onchange="updateTitleName(${index}, this.value)">
-                        <input type="number" value="${title.xp}" class="w-24 p-2 bg-gray-100 rounded-lg border" onchange="updateTitleXP(${index}, this.value)">
-                        <button onclick="deleteTitle(${index})" class="text-red-500 font-bold">Hapus</button>
-                    </div>
-                `;
+                    <div class="flex gap-2 items-center">
+                        <input type="text" value="${t.name}" onchange="titles[${i}].name=this.value" class="flex-1 p-2 bg-gray-50 rounded-lg border border-gray-200 text-sm outline-none focus:border-indigo-400">
+                        <input type="number" value="${t.xp}" onchange="titles[${i}].xp=parseInt(this.value)" class="w-20 p-2 bg-gray-50 rounded-lg border border-gray-200 text-sm outline-none focus:border-indigo-400">
+                        <button onclick="titles.splice(${i},1); openEditTitlesModal()" class="text-red-400 hover:text-red-600 p-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>`;
             });
-            document.getElementById('edit-titles-modal').classList.replace('hidden', 'flex');
+            document.getElementById('edit-titles-modal').classList.remove('hidden');
+            document.getElementById('edit-titles-modal').classList.add('flex');
         }
 
-        // Fungsi untuk menutup modal edit gelar
-        function closeEditTitlesModal() {
-            document.getElementById('edit-titles-modal').classList.replace('flex', 'hidden');
-        }
+        function closeEditTitlesModal() { document.getElementById('edit-titles-modal').classList.add('hidden'); }
+        function addNewTitle() { titles.push({name: 'Gelar Baru', xp: titles[titles.length-1].xp + 1000}); openEditTitlesModal(); }
+        function saveTitles() { titles.sort((a,b)=>a.xp-b.xp); saveToStorage(); updateUI(); closeEditTitlesModal(); }
 
-        // Fungsi untuk menambah gelar baru
-        function addNewTitle() {
-            titles.push({ name: "Gelar Baru", xp: 0 });
-            openEditTitlesModal();
+        // Quest Edit/Delete
+        function openEditQuestModal(cat, idx = null) {
+            currentQuestCategory = cat;
+            currentQuestIndex = idx;
+            const q = idx !== null ? globalState.themes[globalState.currentTheme].customQuests[cat].items[idx] : {label:'', xp:0};
+            document.getElementById('quest-name').value = q.label;
+            document.getElementById('quest-xp').value = q.xp;
+            document.getElementById('edit-quest-modal').classList.replace('hidden', 'flex');
         }
-
-        // Fungsi untuk memperbarui nama gelar
-        function updateTitleName(index, value) {
-            titles[index].name = value;
-        }
-
-        // Fungsi untuk memperbarui XP gelar
-        function updateTitleXP(index, value) {
-            titles[index].xp = parseInt(value, 10) || 0;
-        }
-
-        // Fungsi untuk menghapus gelar
-        function deleteTitle(index) {
-            if (titles.length > 1) {
-                titles.splice(index, 1);
-                openEditTitlesModal();
+        function closeEditQuestModal() { document.getElementById('edit-quest-modal').classList.replace('flex', 'hidden'); }
+        function saveQuest() {
+            const label = document.getElementById('quest-name').value;
+            const xpVal = document.getElementById('quest-xp').value;
+            if (!label || !xpVal) return;
+            
+            const xp = parseInt(xpVal);
+            const cat = globalState.themes[globalState.currentTheme].customQuests[currentQuestCategory];
+            if (currentQuestIndex !== null) {
+                cat.items[currentQuestIndex] = {...cat.items[currentQuestIndex], label, xp};
             } else {
-                alert("Minimal harus ada satu gelar.");
+                cat.items.push({id: 'q'+Date.now(), label, xp});
             }
+            saveToStorage(); renderQuests(); closeEditQuestModal();
+        }
+        function deleteQuest(cat, idx) {
+            showConfirm("Hapus quest ini permanen?", () => {
+                globalState.themes[globalState.currentTheme].customQuests[cat].items.splice(idx, 1);
+                saveToStorage(); 
+                renderQuests();
+            });
         }
 
-        // Fungsi untuk menyimpan gelar
-        function saveTitles() {
-            titles.sort((a, b) => a.xp - b.xp); // Urutkan berdasarkan XP
-            closeEditTitlesModal();
-            updateUI();
+        // Theme Management
+        function renderThemeList() {
+            const container = document.getElementById('theme-list-container');
+            container.innerHTML = '';
+            Object.keys(globalState.themes).forEach(key => {
+                const t = globalState.themes[key];
+                const preset = colorPresets[t.accent];
+                const isActive = globalState.currentTheme === key;
+                
+                container.innerHTML += `
+                    <div class="flex gap-2 items-stretch">
+                        <button onclick="switchTheme('${key}')" class="flex-1 text-left p-4 rounded-xl ${preset.light} border-2 ${isActive ? preset.border : 'border-transparent'} hover:border-gray-200 transition-all">
+                            <span class="font-bold ${preset.text}">${t.title}</span>
+                            <div class="text-xs text-gray-500 mt-1">Lvl ${Math.floor(t.totalXp/500)+1} • ${t.streak} Hari Streak</div>
+                        </button>
+                        ${Object.keys(globalState.themes).length > 1 ? `
+                            <button onclick="deleteTheme('${key}')" class="px-4 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                            </button>
+                        ` : ''}
+                    </div>`;
+            });
         }
-
-        // Fungsi untuk menentukan gelar berdasarkan XP
-        function getTitleByXP(xp) {
-            let title = "Tidak Diketahui";
-            for (let i = titles.length - 1; i >= 0; i--) {
-                if (xp >= titles[i].xp) {
-                    title = titles[i].name;
-                    break;
-                }
-            }
-            return title;
+        function openAddThemeModal() { document.getElementById('add-theme-modal').classList.replace('hidden', 'flex'); }
+        function closeAddThemeModal() { document.getElementById('add-theme-modal').classList.replace('flex', 'hidden'); }
+        function addNewTheme() {
+            const name = document.getElementById('new-theme-title').value;
+            const accent = document.getElementById('new-theme-accent').value;
+            if(!name) return;
+            const key = 't' + Date.now();
+            globalState.themes[key] = {
+                title: name, accent, totalXp:0, dailyChecked:{}, streak:0, lastActiveDate:'',
+                customQuests: { wajib: {title: "Wajib", items:[]}, bonus: {title: "Bonus", items:[]}, negatif: {title: "Penalty", items:[]} },
+                rewards: []
+            };
+            saveToStorage(); renderThemeList(); closeAddThemeModal();
+            switchTheme(key);
+        }
+        function deleteTheme(key) {
+            if(Object.keys(globalState.themes).length <= 1) return;
+            showConfirm(`Hapus tema "${globalState.themes[key].title}" dan semua progresnya?`, () => {
+                delete globalState.themes[key];
+                if(globalState.currentTheme === key) globalState.currentTheme = Object.keys(globalState.themes)[0];
+                saveToStorage(); renderThemeList(); switchTheme(globalState.currentTheme);
+            });
         }
 
         function updateUI() {
             const theme = globalState.themes[globalState.currentTheme];
             const level = Math.floor(theme.totalXp / 500) + 1;
             const xpInLevel = theme.totalXp % 500;
-            const saved = isTodaySaved();
-
+            
             document.getElementById('level-badge').innerText = `LVL ${level}`;
             document.getElementById('xp-text').innerText = `${xpInLevel} / 500 XP`;
             document.getElementById('xp-progress-bar').style.width = `${(xpInLevel / 500) * 100}%`;
             document.getElementById('total-xp').innerText = theme.totalXp;
             document.getElementById('streak-count').innerText = `${theme.streak} Hari`;
             document.getElementById('theme-title').innerText = theme.title;
-            document.getElementById('lock-status').innerText = saved ? "Status: Terkunci" : "Status: Terbuka";
-
+            
             let daily = 0;
             Object.keys(theme.dailyChecked).forEach(id => {
                 Object.values(theme.customQuests).forEach(cat => {
@@ -516,192 +666,117 @@
                 });
             });
             document.getElementById('daily-xp').innerText = daily;
-
-            // Perbarui gelar berdasarkan total XP
+            
             const title = getTitleByXP(theme.totalXp);
             const xpTitleElement = document.getElementById('xp-title');
             xpTitleElement.innerText = title;
-
-            // Sesuaikan warna latar belakang dan teks gelar berdasarkan tema
-            const preset = colorPresets[theme.accent] || colorPresets.indigo;
-            xpTitleElement.className = `px-2 py-1 rounded-lg font-semibold text-base shadow-md ${preset.text} bg-white border ${preset.border}`;
+            xpTitleElement.style.color = colorPresets[theme.accent].hex;
+            xpTitleElement.style.borderColor = colorPresets[theme.accent].hex + '40';
         }
 
         function renderRewards() {
             const theme = globalState.themes[globalState.currentTheme];
             const container = document.getElementById('rewards-container');
+            const emptyMsg = document.getElementById('empty-rewards-msg');
             container.innerHTML = '';
+            
+            if (!theme.rewards || theme.rewards.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+            emptyMsg.classList.add('hidden');
+
             theme.rewards.forEach((r, idx) => {
                 const progress = Math.min((theme.totalXp / r.cost) * 100, 100);
+                const isCompleted = progress >= 100;
+                
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm relative">
-                        <div class="flex justify-between mb-2"><span class="font-bold text-gray-700">${r.name}</span><span class="text-xs font-bold text-gray-400">${theme.totalXp} / ${r.cost} XP</span></div>
-                        <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden"><div class="${colorPresets[theme.accent].bg} h-full" style="width: ${progress}%"></div></div>
-                        <button onclick="deleteReward(${idx})" class="absolute top-1 right-2 text-[10px] text-red-300">hapus</button>
+                    <div class="bg-white p-4 rounded-2xl shadow-sm relative overflow-hidden group">
+                        <div class="flex justify-between mb-2 relative z-10">
+                            <span class="font-bold text-gray-700">${r.name} ${isCompleted ? '🎉' : ''}</span>
+                            <span class="text-xs font-bold ${isCompleted ? 'text-green-600' : 'text-gray-400'}">${theme.totalXp} / ${r.cost} XP</span>
+                        </div>
+                        <div class="w-full bg-gray-100 h-3 rounded-full overflow-hidden relative z-10">
+                            <div class="${isCompleted ? 'bg-green-500' : colorPresets[theme.accent].bg} h-full transition-all duration-700" style="width: ${progress}%"></div>
+                        </div>
+                        <button onclick="deleteReward(${idx})" class="absolute top-1 right-2 text-[10px] text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-20">hapus</button>
                     </div>`;
             });
-        }
-
-        // Fungsi untuk membuka modal tambah tema
-        function openAddThemeModal() {
-            document.getElementById('add-theme-modal').classList.replace('hidden', 'flex');
-        }
-
-        // Fungsi untuk menutup modal tambah tema
-        function closeAddThemeModal() {
-            document.getElementById('add-theme-modal').classList.replace('flex', 'hidden');
-        }
-
-        // Fungsi untuk menambahkan tema baru
-        function addNewTheme() {
-            const title = document.getElementById('new-theme-title').value.trim();
-            const accent = document.getElementById('new-theme-accent').value;
-
-            if (!title) {
-                notify("Gagal", "Nama tema tidak boleh kosong.");
-                return;
-            }
-
-            const newThemeKey = title.toLowerCase().replace(/\s+/g, '_');
-            if (globalState.themes[newThemeKey]) {
-                notify("Gagal", "Tema dengan nama ini sudah ada.");
-                return;
-            }
-
-            globalState.themes[newThemeKey] = {
-                title,
-                accent,
-                totalXp: 0,
-                dailyChecked: {},
-                streak: 0,
-                lastSaveDate: '',
-                customQuests: {
-                    wajib: { title: "📜 Quest Wajib", items: [] },
-                    bonus: { title: "🔵 Quest Bonus", items: [] },
-                    negatif: { title: "🔴 Quest Negatif", items: [] }
-                },
-                rewards: []
-            };
-
-            saveToStorage();
-            renderThemeList();
-            closeAddThemeModal();
-            notify("Berhasil", "Tema baru berhasil ditambahkan.");
-        }
-
-        // Fungsi untuk menghapus tema
-        function deleteTheme(key) {
-            if (Object.keys(globalState.themes).length <= 1) {
-                notify("Gagal", "Minimal harus ada satu tema.");
-                return;
-            }
-
-            if (confirm(`Apakah Anda yakin ingin menghapus tema "${globalState.themes[key].title}"?`)) {
-                delete globalState.themes[key];
-                if (globalState.currentTheme === key) {
-                    globalState.currentTheme = Object.keys(globalState.themes)[0];
-                }
-                saveToStorage();
-                renderThemeList();
-                applyThemeStyles();
-                renderAll();
-                updateUI();
-                notify("Berhasil", "Tema berhasil dihapus.");
-            }
-        }
-
-        // Perbarui renderThemeList untuk menambahkan tombol hapus
-        function renderThemeList() {
-            const container = document.getElementById('theme-list-container');
-            container.innerHTML = '';
-            Object.keys(globalState.themes).forEach(key => {
-                const t = globalState.themes[key];
-                container.innerHTML += `
-                    <div class="flex items-center gap-3">
-                        <button onclick="switchTheme('${key}')" class="flex-1 text-left p-4 rounded-2xl ${colorPresets[t.accent].light} border-2 ${globalState.currentTheme === key ? colorPresets[t.accent].border : 'border-transparent'}">
-                            <p class="font-bold ${colorPresets[t.accent].darkText}">${t.title}</p>
-                        </button>
-                        <button onclick="deleteTheme('${key}')" class="text-red-500 text-sm font-bold">Hapus</button>
-                    </div>`;
-            });
-        }
-
-        function switchTheme(key) { globalState.currentTheme = key; applyThemeStyles(); renderAll(); updateUI(); toggleThemeMenu(); }
-        function toggleThemeMenu() { const m = document.getElementById('theme-menu'); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
-        function switchView(view) { activeView = view; applyThemeStyles(); document.getElementById('view-quests').classList.toggle('hidden', view !== 'quests'); document.getElementById('view-rewards').classList.toggle('hidden', view !== 'rewards'); }
-        function toggleEditMode() { isEditMode = !isEditMode; document.getElementById('edit-master-btn').classList.toggle('bg-red-500', isEditMode); document.getElementById('edit-indicator').classList.toggle('hidden', !isEditMode); renderQuests(); }
-        
-        function openAddQuestModal(cat) {
-            openInputModal("Tambah Quest", `<input type="text" id="q-label" placeholder="Nama Quest" class="w-full p-3 bg-gray-100 rounded-xl mb-2"><input type="number" id="q-xp" placeholder="XP (Misal: 20)" class="w-full p-3 bg-gray-100 rounded-xl">`, () => {
-                const label = document.getElementById('q-label').value;
-                const xp = parseInt(document.getElementById('q-xp').value);
-                if(label && !isNaN(xp)) { globalState.themes[globalState.currentTheme].customQuests[cat].items.push({ id: 'q_'+Date.now(), label, xp }); saveToStorage(); renderQuests(); closeInputModal(); }
-            });
-        }
-
-        function deleteQuest(cat, id) {
-            const theme = globalState.themes[globalState.currentTheme];
-            theme.customQuests[cat].items = theme.customQuests[cat].items.filter(i => i.id !== id);
-            delete theme.dailyChecked[id];
-            saveToStorage(); renderQuests(); updateUI();
         }
 
         function openAddRewardModal() {
-            openInputModal("Tambah Hadiah", `<input type="text" id="rew-name" placeholder="Misal: Beli Game" class="w-full p-3 bg-gray-100 rounded-xl mb-2"><input type="number" id="rew-cost" placeholder="Target XP" class="w-full p-3 bg-gray-100 rounded-xl">`, () => {
-                const name = document.getElementById('rew-name').value;
-                const cost = parseInt(document.getElementById('rew-cost').value);
-                if(name && cost) { globalState.themes[globalState.currentTheme].rewards.push({ name, cost }); saveToStorage(); renderRewards(); closeInputModal(); }
+            showPrompt((name, cost) => {
+                const costNum = parseInt(cost);
+                if (name && costNum) {
+                    if (!globalState.themes[globalState.currentTheme].rewards) {
+                         globalState.themes[globalState.currentTheme].rewards = [];
+                    }
+                    globalState.themes[globalState.currentTheme].rewards.push({name, cost: costNum});
+                    saveToStorage(); renderRewards();
+                }
             });
         }
 
-        function deleteReward(idx) { globalState.themes[globalState.currentTheme].rewards.splice(idx, 1); saveToStorage(); renderRewards(); }
-        
-        function openInputModal(title, html, onConfirm) {
-            document.getElementById('input-modal-title').innerText = title;
-            document.getElementById('input-modal-fields').innerHTML = html;
-            document.getElementById('input-modal-confirm').onclick = onConfirm;
-            document.getElementById('input-modal').classList.replace('hidden', 'flex');
-        }
-        function closeInputModal() { document.getElementById('input-modal').classList.replace('flex', 'hidden'); }
-        function notify(title, desc) { document.getElementById('modal-title').innerText = title; document.getElementById('modal-desc').innerText = desc; document.getElementById('modal').classList.replace('hidden', 'flex'); }
-        function closeModal() { document.getElementById('modal').classList.replace('flex', 'hidden'); }
-        
-        function saveToStorage() { 
-            localStorage.setItem('quest_master_v7_full', JSON.stringify(globalState)); 
+        function deleteReward(idx) {
+            showConfirm("Hapus target hadiah ini?", () => {
+                 globalState.themes[globalState.currentTheme].rewards.splice(idx, 1);
+                 saveToStorage(); renderRewards();
+            });
         }
 
-        function resetDaily() { if(confirm("Hapus centang hari ini? XP tersimpan tetap aman.")) { globalState.themes[globalState.currentTheme].dailyChecked = {}; renderQuests(); updateUI(); } }
-        
+        function createConfetti() {
+            for(let i=0; i<40; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.backgroundColor = ['#ff0', '#f0f', '#0ff', '#0f0', '#ff4d4d'][Math.floor(Math.random()*5)];
+                c.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 4000);
+            }
+        }
+
         function exportData() {
-            const blob = new Blob([JSON.stringify(globalState)], {type: "application/json"});
+            const blob = new Blob([JSON.stringify({state: globalState, titles: titles})], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `backup_quest_${Date.now()}.json`;
+            a.href = url;
+            a.download = `quest_master_backup_${new Date().toISOString().slice(0,10)}.json`;
             a.click();
-            notify("Ekspor Berhasil", "File backup telah diunduh. Simpan file ini.");
         }
 
         function importData() {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = ".json";
+            input.accept = '.json';
             input.onchange = e => {
                 const file = e.target.files[0];
+                if (!file) return;
+                
                 const reader = new FileReader();
                 reader.onload = event => {
                     try {
-                        const imported = JSON.parse(event.target.result);
-                        globalState = imported;
-                        saveToStorage();
-                        location.reload();
-                    } catch(e) { notify("Gagal", "File tidak valid!"); }
+                        const data = JSON.parse(event.target.result);
+                        if (data.state && data.titles) {
+                            showConfirm("Data saat ini akan ditimpa dengan data backup. Lanjutkan?", () => {
+                                globalState = data.state;
+                                titles = data.titles;
+                                saveToStorage(); 
+                                location.reload();
+                            });
+                        } else {
+                            showMessage("File backup tidak valid.", "❌");
+                        }
+                    } catch(err) {
+                        showMessage("Gagal membaca file.", "❌");
+                    }
                 };
                 reader.readAsText(file);
             };
             input.click();
         }
 
-        window.onload = init;
+        init();
     </script>
 </body>
 </html>
